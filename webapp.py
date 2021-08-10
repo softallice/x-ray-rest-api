@@ -120,6 +120,9 @@ def detect(save_img=False):
 
     # Get names and colors
     names = model.module.names if hasattr(model, 'module') else model.names
+
+    # print("names === ", names)
+
     colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
 
     # Run inference
@@ -175,10 +178,15 @@ def detect(save_img=False):
                             f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
                     if save_img or view_img:  # Add bbox to image
+                        # print("name : ==== ", names)
+                        print("int(cls) : ==== ", int(cls))
+                        diagnosis = ['대동맥확장', '무기폐', '석회화', '심장비대', '폐경결', '간질성폐질환', '침윤', '폐불투명도', '결절/덩어리', '기타병변', '흉막삼출', '흉막비후', '기흉', '폐섬유증' ]
+                        diagnosis_label = f'{diagnosis[int(cls)]} {conf:.2f}'
+                        # label = f'{diagnosis[int(cls)]} {conf:.2f}'
                         label = f'{names[int(cls)]} {conf:.2f}'
                         # opa = conf
                         # diagnosis = names[int(cls)]
-                        plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=3)
+                        plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=1)
 
             # Print time (inference + NMS)
             print(f'{s}Done. ({t2 - t1:.3f}s)')
@@ -215,8 +223,8 @@ def detect(save_img=False):
     
     if label:
         diagnosis = {
-            "name": label.split(' ')[0],
-            "rate": label.split(' ')[1]
+            "name": diagnosis_label.split(' ')[0],
+            "rate": diagnosis_label.split(' ')[1]
         }
     else:
         diagnosis = {
