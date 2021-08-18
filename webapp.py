@@ -48,8 +48,8 @@ def predict():
         save_file = "images/"+ file_name + "/" + file_name + ".jpg"
         img.save(save_file)        
         
+        # 예측에 사용되는 추가 변수
         args.file_name = file_name
-
         args.source = 'images/'+ file_name
         args.img_size = 640
         args.conf_thres = 0.15
