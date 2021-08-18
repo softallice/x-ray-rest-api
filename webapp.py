@@ -16,6 +16,7 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 
 # 플라스크 rest-api 생성
 import io
+import shutil
 import os
 from PIL import Image
 from flask import Flask, render_template, request, redirect
@@ -44,6 +45,7 @@ def predict():
 
         # 이미지 저장 폴더 생성 및 파일 저장
         save_path = './images/' + file_name
+        shutil.rmtree(save_path)
         os.makedirs(save_path)
         save_file = "images/"+ file_name + "/" + file_name + ".jpg"
         img.save(save_file)        
