@@ -18,10 +18,15 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 import io
 from PIL import Image
 from flask import Flask, render_template, request, redirect
+from flask_cors import CORS, cross_origin 
+
+
 
 app = Flask(__name__)
+CORS(app)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/predict", methods=["GET", "POST"])
+# @app.route("/predict", methods=["POST"])
 def predict():
     if request.method == "POST":
         if "file" not in request.files:
@@ -30,11 +35,16 @@ def predict():
         if not file:
             return
 
+        file_name = request.form["fileName"]
+        
         img_bytes = file.read()
         img = Image.open(io.BytesIO(img_bytes))
 
-
-        img.save("images/image0.jpg")        
+        save_path = "images/" + file_name + ".jpg"
+        print("save_path : ", save_path)
+        img.save(save_path)        
+        
+        args.file_name = file_name
 
         args.source = 'images'
         args.img_size = 640
@@ -82,7 +92,7 @@ def predict():
 
 
 def detect(save_img=False):
-    source, weights, view_img, save_txt, imgsz = args.source, args.weights, args.view_img, args.save_txt, args.img_size
+    source, weights, view_img, save_txt, imgsz, file_name = args.source, args.weights, args.view_img, args.save_txt, args.img_size, args.file_name
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
         ('rtsp://', 'rtmp://', 'http://'))
 
@@ -224,7 +234,8 @@ def detect(save_img=False):
     if label:
         diagnosis = {
             "name": diagnosis_label.split(' ')[0],
-            "rate": diagnosis_label.split(' ')[1]
+            "rate": diagnosis_label.split(' ')[1],
+            'img_url': "http://localhost:5000/static/exp/"+file_name+".jpg"
         }
     else:
         diagnosis = {
