@@ -16,6 +16,7 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 
 # 플라스크 rest-api 생성
 import io
+import os
 from PIL import Image
 from flask import Flask, render_template, request, redirect
 from flask_cors import CORS, cross_origin 
@@ -34,19 +35,22 @@ def predict():
         file = request.files["file"]
         if not file:
             return
-
+        # app에서 넘겨준 form의 파일명
         file_name = request.form["fileName"]
         
+        # 이미지 파일 읽기
         img_bytes = file.read()
         img = Image.open(io.BytesIO(img_bytes))
 
-        save_path = "images/" + file_name + ".jpg"
-        print("save_path : ", save_path)
-        img.save(save_path)        
+        # 이미지 저장 폴더 생성 및 파일 저장
+        save_path = './images/' + file_name
+        os.makedirs(save_path)
+        save_file = "images/"+ file_name + "/" + file_name + ".jpg"
+        img.save(save_file)        
         
         args.file_name = file_name
 
-        args.source = 'images'
+        args.source = 'images/'+ file_name
         args.img_size = 640
         args.conf_thres = 0.15
         args.iou_thres = 0.5
@@ -66,7 +70,7 @@ def predict():
         args.name = 'exp'
         args.weights = 'runs/train/exp/weights/best.pt'
 
-        print("args.update : ", args.update)
+        # print("args.update : ", args.update)
         with torch.no_grad():
             if args.update:  # update all models (to fix SourceChangeWarning)
                 for args.weights in ['yolov5s.pt', 'yolov5m.pt', 'yolov5l.pt', 'yolov5x.pt']:
@@ -127,6 +131,7 @@ def detect(save_img=False):
     else:
         save_img = True
         dataset = LoadImages(source, img_size=imgsz)
+        print("dataset : ", dataset)
 
     # Get names and colors
     names = model.module.names if hasattr(model, 'module') else model.names
@@ -189,7 +194,7 @@ def detect(save_img=False):
 
                     if save_img or view_img:  # Add bbox to image
                         # print("name : ==== ", names)
-                        print("int(cls) : ==== ", int(cls))
+                        # print("int(cls) : ==== ", int(cls))
                         diagnosis = ['대동맥확장', '무기폐', '석회화', '심장비대', '폐경결', '간질성폐질환', '침윤', '폐불투명도', '결절/덩어리', '기타병변', '흉막삼출', '흉막비후', '기흉', '폐섬유증' ]
                         diagnosis_label = f'{diagnosis[int(cls)]} {conf:.2f}'
                         # label = f'{diagnosis[int(cls)]} {conf:.2f}'
@@ -229,7 +234,7 @@ def detect(save_img=False):
         print(f"Results saved to {save_dir}{s}")
 
     print(f'Done. ({time.time() - t0:.3f}s)')
-    print("label : ", label)
+    # print("label : ", label)
     
     if label:
         diagnosis = {
