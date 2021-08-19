@@ -45,7 +45,9 @@ def predict():
 
         # 이미지 저장 폴더 생성 및 파일 저장
         save_path = './images/' + file_name
-        shutil.rmtree(save_path)
+        if os.path.isdir(save_path):
+            shutil.rmtree(save_path)
+
         os.makedirs(save_path)
         save_file = "images/"+ file_name + "/" + file_name + ".jpg"
         img.save(save_file)        
@@ -242,7 +244,7 @@ def detect(save_img=False):
         diagnosis = {
             "name": diagnosis_label.split(' ')[0],
             "rate": diagnosis_label.split(' ')[1],
-            'img_url': "http://localhost:5000/static/exp/"+file_name+".jpg"
+            'img_url': "http://172.27.42.184:5000/static/exp/"+file_name+".jpg"
         }
     else:
         diagnosis = {
