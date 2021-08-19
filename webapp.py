@@ -244,7 +244,7 @@ def detect(save_img=False):
         diagnosis = {
             "name": diagnosis_label.split(' ')[0],
             "rate": diagnosis_label.split(' ')[1],
-            'img_url': "http://172.27.42.184:5000/static/exp/"+file_name+".jpg"
+            'img_url': "http://localhost:5000/static/exp/"+file_name+".jpg"
         }
     else:
         diagnosis = {
